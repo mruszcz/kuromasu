@@ -19,14 +19,14 @@ import utils_kuro as uk
 
 class Board:   
     def __init__(self):
-        self.board = np.array([[0, 2, 0, 0, -1, 0, 0], 
-                               [0, 0, 0, -1, 0, -1, 0],
-                               [0, 0, -1, 0, 0, 0, -1],
+        self.board = np.array([[2, 0, -1, 0, 0, 0, 0],
+                               [-1, 0 , 0, -1, 0, 0, 0], 
+                               [0, 0, -1, 0, -1, 0, 0],
                                [0, -1, 0, 0, 0, -1, 0],
-                               [-1, 0, 0, 0, -1, 0, 0],
-                               [0, -1, 0 -1, 0, 0, 0], 
-                               [0, 0, -1, 0, 0, 0, 0]])
-        self.solvedBoard = np.ndarray((4,4))
+                               [0, 0, -1, 0, -1, 0, 0],
+                               [0, 0, 0, 0, 0, 0, 0], 
+                               [0, 0, 0, 0, 0, 0, 0]])
+        self.solvedBoard = np.ndarray((7,7))
         self.valid = True
         
     # substitute all grey entries with white instead        
@@ -48,6 +48,7 @@ class Board:
         print "solvedWhite", solvedWhite, "valid", self.valid
         if( solvedWhite and self.valid ):
             self.solvedBoard = self.board
+            print "solved", self.solvedBoard
                
     
     def checkSurround(self):
@@ -58,10 +59,8 @@ class Board:
                 # if field contains a number
                 if (row[y] > 1):
                     sumWhite = 1 # the field itself is counted
-                    print "x:", x, "y:", y, "row:", row, "check:", row[y]
                     sumWhite += uk.count_column(self.board, x, y)
                     sumWhite += uk.count_row(self.board, x, y)
-                    print sumWhite
                     # if suurounding fields correspond 
                     if(sumWhite != row[y] ):
                         solvedWhite = False
@@ -76,43 +75,57 @@ class Board:
                     if(self.valid):
                         if( self.searchBlackCircle([x,y], [x,y], [x,y], first = True) ):
                             self.valid = False
-                            print "i found a circle"
                             return solvedWhite
                     else:
                         return solvedWhite
         return solvedWhite
     
     def searchBlackCircle(self, start, prev, cur, first):
-        print "looking for circles now"
+
         if( (not first) and (start == cur) ):
+            print "i am back at the beinning and found circle from: ", start, "prev", prev, "end", cur
             return True
-        if( uk.separateBoard(self.board, start, cur) ):
+        if( (not first) and (uk.separateBoard(self.board, start, cur)) ):
             return True
         first = False
+        
         x = cur[0] - 1
         y = cur[1] - 1
         # if no circle found
         print "x", x, "y", y, "cur", cur, "prev", prev, "start", start, self.board[x][y]
-        if( uk.continueSearch(self.board, prev, x, y) ):
+        if( self.continueSearch(self.board, prev, x, y) ):
             if( self.searchBlackCircle(start, cur, [x, y], first) ): return True
+            else: return False
         
         y = cur[1] + 1
         print "x", x, "y", y, "cur", cur, "prev", prev, "start", start, self.board[x][y]
-        if( uk.continueSearch(self.board, prev, x, y) ):
+        if( self.continueSearch(self.board, prev, x, y) ):
             if( self.searchBlackCircle(start, cur, [x, y], first) ): return True
+            else: return False
         
         x = cur[0] + 1
         y = cur[1] - 1
         print "x", x, "y", y, "cur", cur, "prev", prev, "start", start, self.board[x][y]
         # if no circle found
-        if( uk.continueSearch(self.board, prev, x, y) ):
+        if( self.continueSearch(self.board, prev, x, y) ):
             if( self.searchBlackCircle(start, cur, [x, y], first) ): return True
+            else: return False
         
         y = cur[1] + 1
         print "x", x, "y", y, "cur", cur, "prev", prev, "start", start, self.board[x][y]
-        if( uk.continueSearch(self.board, prev, x, y) ):
+        if( self.continueSearch(self.board, prev, x, y) ):
             if( self.searchBlackCircle(start, cur, [x, y], first) ): return True
-               
+            else: return False
+            
+    def continueSearch(self, board, prev, x, y ):
+        if( (x >= 0 and x <= len(board)-1) and (y >= 0 and y <= len(board[0])-1 )):
+            if( (board[x][y] == -1) and (prev != [x, y]) ):
+                print "x, y", x, y, "prev:", prev
+                return True
+            else:
+                return False
+        else: return False
+                 
 
 def main():
     my_board = Board()

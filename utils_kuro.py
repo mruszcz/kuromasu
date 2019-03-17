@@ -71,18 +71,18 @@ def checkAdjacenBlack(board, row, col):
         return True
         
 def continueSearch( board, prev, x, y ):
-    if( (board[x][y] == -1) and (prev != [x, y]) ):
-        return True
-    else:
-        return False
+    if( (x >= 0 and x <= len(board)-1) and (y >= 0 and y <= len(board[0])-1 )):
+        if( (board[x][y] == -1) and (prev != [x, y]) ):
+            return True
+        else:
+            return False
+    else: return False
 
 def separateBoard(board, start, cur):
-    noRow = len(board)
-    noCol = len(board[0])
-    if( (start[0] == 0 and cur[0] == 0) or (start[0] == 0 and cur[0]== noRow-1) or 
-    (start[0] == noRow-1 and cur[0]==0) or (start[0] == noRow-1 and cur[0]== noRow-1) or 
-    (start[1] == 0 and cur[1] == 0) or (start[1] == 0 and cur[1]== noCol-1) or 
-    (start[1] == noCol-1 and cur[1]==0) or (start[1] == noCol-1 and cur[1]== noCol-1) ):
-        return True
-    else:
-        return False
+    noRow = len(board) -1
+    noCol = len(board[0]) -1        
+    return( uk.atEdge(start, noRow, noCol) and uk.atEdge(cur, noRow, noCol))
+        
+        
+def atEdge(cell, noRow, noCol):
+    return( cell[0] == 0 or cell[0] == noRow or cell[1] == 0 or cell[1] == noCol )
