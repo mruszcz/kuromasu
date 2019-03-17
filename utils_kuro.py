@@ -4,7 +4,8 @@ Created on Thu Mar 14 15:07:49 2019
 
 @author: oem
 """
-
+import numpy as np
+from main import Board
 
 def white(x):
     if( x > 0 ):
@@ -86,3 +87,13 @@ def separateBoard(board, start, cur):
         return True
     else:
         return False
+
+
+def findPos(mask):
+    noRow = len(mask)
+    noCol = len(mask[0])
+
+    for y in range(noRow):
+        for x in range(noCol):
+            if mask[y][x] is 1:
+                return x,y
