@@ -85,4 +85,13 @@ def separateBoard(board, start, cur):
         
         
 def atEdge(cell, noRow, noCol):
-    return( cell[0] == 0 or cell[0] == noRow or cell[1] == 0 or cell[1] == noCol )
+    return (cell[0] == 0 or cell[0] == noRow or cell[1] == 0 or cell[1] == noCol)
+
+def findPos(mask):
+    noRow = len(mask)
+    noCol = len(mask[0])
+
+    for y in range(noRow):
+        for x in range(noCol):
+            if mask[y][x] is 1:
+                return x,y

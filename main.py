@@ -1,6 +1,6 @@
 import numpy as np
 from time import time
-import utils
+import utils_kuro as utils
 
 class Kuromasu:
 
@@ -13,7 +13,6 @@ class Kuromasu:
 
         self.executionTime = 0
         self.iterations = 0
-        self.maxBreadthFlag = False
         
     def solve(self, mode):
         """Method for solvind the board
@@ -55,23 +54,26 @@ class Kuromasu:
 
     def _recursiveDF(self, prvBoard, currBoard):
         """Method finding all solutions to the puzzle, using recursive strategy"""
-        #TODO: how to end this recursion? when to stop? whats the meaning of life?
         self.iterations += 1
 
-        if utils.isSolution(currBoard): #found one solution TODO
-                self.solvedBoards.append(currBoard)
+        if not utils.validate(currBoard):
+            pass
+        
+        if utils.isSolution(currBoard): #found one solution
+            self.solvedBoards.append(currBoard)
 
-        if utils.validate(currBoard):  #check rules
-            nextBoard = utils.placeNextBlack(currBoard=currBoard, prvBoard=prvBoard)
 
-            if nextBoard != currBoard:
-                self._recursiveDF(currBoard, nextBoard)  #go deep
-                    
+        nextBoard = utils.placeNextBlack(currBoard=currBoard, prvBoard=prvBoard)
+        if nextBoard != currBoard:
+            self._recursiveDF(currBoard, nextBoard)  #go deep
         else:
-            nextBoard = utils.placeNextBlack(currBoard, prvBoard, deepen=False)
-
-            if nextBoard != currBoard:
-                self._recursiveDF(prvBoard, nextBoard)  #go horizontal
+            pass
+            
+        nextBoard = utils.placeNextBlack(currBoard, prvBoard, deepen=False)
+        if nextBoard != currBoard:
+            self._recursiveDF(prvBoard, nextBoard)  #go horizontal
+        else:
+            pass
             
 
 
