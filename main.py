@@ -32,10 +32,21 @@ class Kuromasu:
         return self.solvedBoard, self.exectutionTime, self.iterations
 
     def _validate(self):
+        valid = True
         # checks board agianst rules of the game
-
+        for x in range(len(self.board)):
+            row = self.board[x]
+            for y in range(len(row)):
+                if ( utils.black(row[y]) ):
+                    # check for black adjacent fields
+                    valid = utils.checkAdjacenBlack(self.board, x, y)
+                    
+                    # look for circles in the field
+                    if(valid):
+                        if( utils.searchBlackCircle(self.board, [x,y], [x,y], [x,y], first = True) ):
+                            valid = False
         # returns boolean
-        return True or False
+        return valid
     
     
     def _DF(self):
@@ -74,7 +85,8 @@ class Kuromasu:
             self._recursiveDF(prvBoard, nextBoard)  #go horizontal
         else:
             pass
-            
+            fill_white()
+    my_board.validate()
 
 
     def _placeNextBlack(currBoard, prvBoard, deepen=True):
@@ -115,3 +127,4 @@ class Kuromasu:
         board[x][y] = -1
         
         return board
+        

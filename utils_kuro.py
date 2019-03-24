@@ -11,8 +11,29 @@ def white(x):
         return 1
     else:
         return 0
+        
+def black(x):
+    if(x == -1):
+        return 1
+    else:
+        return 0
 
-
+def isSolution(board):
+    solvedWhite = True
+    for x in range(len(self.board)):
+        row = self.board[x] 
+        for y in range(len(row)):
+            # if field contains a number
+            if (row[y] > 1):
+                sumWhite = 1 # the field itself is counted
+                sumWhite += count_column(self.board, x, y)
+                sumWhite += count_row(self.board, x, y)
+                # if suurounding fields correspond 
+                if(sumWhite != row[y] ):
+                    solvedWhite = False
+#                if( sumWhite is 1 ):
+#                    self.valid = False
+    return solvedWhite
 
 def count_row(board, row, col):
     cntWhite = 0
@@ -29,7 +50,6 @@ def count_row(board, row, col):
    
     # check all the fields right from the examined field
     y = col +1    
-    
     while(y < len(board[0])):
         cell = board[row][y]
         if( not white(cell) ):
@@ -65,10 +85,48 @@ def count_column(board, row, col):
     return cntWhite
     
 def checkAdjacenBlack(board, row, col):
-    if( (board[row-1][col] == -1) or (board[row+1][col] == -1) or (board[row][col-1] == -1) or (board[row][col+1] == -1) ):
+    if( black(board[row-1][col]) or black(board[row+1][col]) or black(board[row][col-1]) or black(board[row][col+1]) ):
         return False
     else:
         return True
+
+def searchBlackCircle(board, start, prev, cur, first):
+
+    if( (not first) and (start == cur) ):
+        print "i am back at the beinning and found circle from: ", start, "prev", prev, "end", cur
+        return True
+    if( (not first) and (uk.separateBoard(self.board, start, cur)) ):
+        return True
+    first = False
+    
+    x = cur[0] - 1
+    y = cur[1] - 1
+    # if no circle found
+    print "x", x, "y", y, "cur", cur, "prev", prev, "start", start, self.board[x][y]
+    if( continueSearch(board, prev, x, y) ):
+        if( searchBlackCircle(start, cur, [x, y], first) ): return True
+        else: return False
+    
+    y = cur[1] + 1
+    print "x", x, "y", y, "cur", cur, "prev", prev, "start", start, self.board[x][y]
+    if( continueSearch( board, prev, x, y) ):
+        if( searchBlackCircle(start, cur, [x, y], first) ): return True
+        else: return False
+    
+    x = cur[0] + 1
+    y = cur[1] - 1
+    print "x", x, "y", y, "cur", cur, "prev", prev, "start", start, self.board[x][y]
+    # if no circle found
+    if( continueSearch( board, prev, x, y) ):
+        if( searchBlackCircle(start, cur, [x, y], first) ): return True
+        else: return False
+    
+    y = cur[1] + 1
+    print "x", x, "y", y, "cur", cur, "prev", prev, "start", start, self.board[x][y]
+    if( continueSearch( board, prev, x, y) ):
+        if( searchBlackCircle(start, cur, [x, y], first) ): return True
+        else: return False
+
         
 def continueSearch( board, prev, x, y ):
     if( (x >= 0 and x <= len(board)-1) and (y >= 0 and y <= len(board[0])-1 )):
