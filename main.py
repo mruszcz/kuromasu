@@ -86,8 +86,11 @@ class Kuromasu:
 
         noRow = len(board)
         noCol = len(board[0])
-
-        x, y = utils.findPos(mask) #coords of last change
+        if currBoard is not prvBoard:
+            x, y = utils.findPos(mask)  #coords of last change
+        else:   #entry case
+            x = 0
+            y = 0
 
         if not deepen:
             board[x][y] = 1
