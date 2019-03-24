@@ -1,5 +1,6 @@
 import numpy as np
 from time import time
+from math import inf
 import utils_kuro as utils
 
 class Kuromasu:
@@ -9,7 +10,7 @@ class Kuromasu:
                       [2, 0, 2, 0],
                       [0, 3, 0, 4],
                       [0, 0, 0, 0]])
-        self.solvedBoards = [] # list of solved boards
+        self.solvedBoards = {"board": np.empty_like(self.board), "length": inf}  # shortest board
 
         self.executionTime = 0
         self.iterations = 0
@@ -23,13 +24,19 @@ class Kuromasu:
         if mode is "A*":
             # A* algortihm
             self.solvedBoard = self._astar()
+
         elif mode is "DF":
             # depth-first algorith
             self.solvedBoard = self._DF()
+
         else:
             Exception("Argument error! Wrong argument for solve method")
 
         return self.solvedBoard, self.exectutionTime, self.iterations
+
+    def isShorter(self, board):
+
+        return utils.length(board) < self.solvedBoard["length"]
 
     def _validate(self):
         valid = True
@@ -64,14 +71,15 @@ class Kuromasu:
 
 
     def _recursiveDF(self, prvBoard, currBoard):
-        """Method finding all solutions to the puzzle, using recursive strategy"""
+        """Method finding shortest solution to the puzzle, using recursive strategy"""
         self.iterations += 1
 
         if not utils.validate(currBoard):
             pass
         
-        if utils.isSolution(currBoard): #found one solution
-            self.solvedBoards.append(currBoard)
+        if utils.isSolution(currBoard) and self.isShorter(currBoard): #found shorter solution
+            self.solvedBoard["board"] = currBoard
+            self.solvedBoard["length"] = utils.length(currBoard)
 
 
         nextBoard = utils.placeNextBlack(currBoard=currBoard, prvBoard=prvBoard)
@@ -85,8 +93,6 @@ class Kuromasu:
             self._recursiveDF(prvBoard, nextBoard)  #go horizontal
         else:
             pass
-            fill_white()
-    my_board.validate()
 
 
     def _placeNextBlack(currBoard, prvBoard, deepen=True):

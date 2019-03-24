@@ -4,7 +4,7 @@ Created on Thu Mar 14 15:07:49 2019
 
 @author: oem
 """
-
+import numpy as np
 
 def white(x):
     if( x > 0 ):
@@ -20,14 +20,14 @@ def black(x):
 
 def isSolution(board):
     solvedWhite = True
-    for x in range(len(self.board)):
-        row = self.board[x] 
+    for x in range(len(board)):
+        row = board[x] 
         for y in range(len(row)):
             # if field contains a number
             if (row[y] > 1):
                 sumWhite = 1 # the field itself is counted
-                sumWhite += count_column(self.board, x, y)
-                sumWhite += count_row(self.board, x, y)
+                sumWhite += count_column(board, x, y)
+                sumWhite += count_row(board, x, y)
                 # if suurounding fields correspond 
                 if(sumWhite != row[y] ):
                     solvedWhite = False
@@ -152,4 +152,13 @@ def findPos(mask):
     for y in range(noRow):
         for x in range(noCol):
             if mask[y][x] is 1:
-                return x,y
+                return x, y
+                
+def length(board):
+    len = 0
+    with np.nditer(board) as iterator:
+        for x in iterator:
+            if x is - 1:
+                len += 1
+    
+    return len
