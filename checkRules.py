@@ -9,7 +9,6 @@ Created on Thu Mar 14 09:52:52 2019
 
 # Import required libraries.
 import numpy as np
-import scipy as sp
 import utils_kuro as uk
 
 # black: -1
@@ -112,7 +111,7 @@ class Board:
             else: return False
         
         y = cur[1] + 1
-        print "x", x, "y", y, "cur", cur, "prev", prev, "start", start, self.board[x][y]
+        print ("x", x, "y", y, "cur", cur, "prev", prev, "start", start, self.board[x][y])
         if( self.continueSearch(self.board, prev, x, y) ):
             if( self.searchBlackCircle(start, cur, [x, y], first) ): return True
             else: return False
@@ -120,7 +119,7 @@ class Board:
     def continueSearch(self, board, prev, x, y ):
         if( (x >= 0 and x <= len(board)-1) and (y >= 0 and y <= len(board[0])-1 )):
             if( (board[x][y] == -1) and (prev != [x, y]) ):
-                print "x, y", x, y, "prev:", prev
+                print ("x, y", x, y, "prev:", prev)
                 return True
             else:
                 return False
