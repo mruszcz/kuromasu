@@ -3,62 +3,67 @@ from time import time
 from math import inf
 import utils_kuro as utils
 
+
 class Kuromasu:
 
     def __init__(self):
         self.board = np.array([[0, 0, 0, 0],
-                      [2, 0, 2, 0],
-                      [0, 3, 0, 4],
-                      [0, 0, 0, 0]])
-        self.solvedBoards = {"board": np.empty_like(self.board), "length": inf}  # shortest board
+                               [2, 0, 2, 0],
+                               [0, 3, 0, 4],
+                               [0, 0, 0, 0]])
+        self.solvedBoard = {"board": np.empty_like(
+            self.board), "length": inf}  # shortest board
 
         self.executionTime = 0
         self.iterations = 0
-        
+
     def solve(self, mode):
         """Method for solvind the board
         Arguments: self, mode
         mode can be either A* or DF"""
-
 
         if mode is "A*":
             # A* algortihm
             self.solvedBoard = self._astar()
 
         elif mode is "DF":
-            # depth-first algorith
+            # depth-first algorithm
             self.solvedBoard = self._DF()
 
         else:
             Exception("Argument error! Wrong argument for solve method")
 
-        return self.solvedBoard, self.exectutionTime, self.iterations
-
     def isShorter(self, board):
 
         return utils.length(board) < self.solvedBoard["length"]
 
-    def _validate(self):
+    def initialize(self):
+        for i in range(len(self.board)):
+            row = self.board[i]
+            for j in range(0, len(row)):
+                if row[j] == 0:
+                    self.board[i][j] = 1
+
+    def _validate(self, board):
         valid = True
         # checks board agianst rules of the game
-        for x in range(len(self.board)):
-            row = self.board[x]
+        for x in range(len(board)):
+            row = board[x]
             for y in range(len(row)):
-                if ( utils.black(row[y]) ):
+                if utils.isBlack(row[y]):
                     # check for black adjacent fields
-                    valid = utils.checkAdjacenBlack(self.board, x, y)
-                    
+                    valid = utils.checkAdjacentBlack(board, x, y)
+
                     # look for circles in the field
-                    if(valid):
-                        if( utils.searchBlackCircle(self.board, [x,y], [x,y], [x,y], first = True) ):
+                    if valid:
+                        if utils.searchBlackCircle(board, [x, y], [x, y], [x, y], first=True):
                             valid = False
         # returns boolean
         return valid
-    
-    
+
     def _DF(self):
         """Implementation of depth-first algorithm"""
-        self.initialize()  #whiten all
+        self.initialize()  # whiten all
 
         entryTime = time()
         self.iterations = 0
@@ -69,44 +74,45 @@ class Kuromasu:
 
         self.executionTime = exitTime - entryTime
 
-
     def _recursiveDF(self, prvBoard, currBoard):
         """Method finding shortest solution to the puzzle, using recursive strategy"""
         self.iterations += 1
+        print(self.iterations)
 
-        if not utils.validate(currBoard):
+        if not self._validate(currBoard):
             pass
-        
-        if utils.isSolution(currBoard) and self.isShorter(currBoard): #found shorter solution
+
+        # found shorter solution
+        if utils.isSolution(currBoard) and self.isShorter(currBoard):
             self.solvedBoard["board"] = currBoard
             self.solvedBoard["length"] = utils.length(currBoard)
 
-
-        nextBoard = utils.placeNextBlack(currBoard=currBoard, prvBoard=prvBoard)
-        if nextBoard != currBoard:
-            self._recursiveDF(currBoard, nextBoard)  #go deep
-        else:
-            pass
-            
-        nextBoard = utils.placeNextBlack(currBoard, prvBoard, deepen=False)
-        if nextBoard != currBoard:
-            self._recursiveDF(prvBoard, nextBoard)  #go horizontal
+        nextBoard = self._placeNextBlack(
+            currBoard=currBoard, prvBoard=prvBoard)
+        if not np.array_equal(nextBoard, currBoard):
+            self._recursiveDF(currBoard, nextBoard)  # go deep
         else:
             pass
 
+        nextBoard = self._placeNextBlack(currBoard, prvBoard, deepen=False)
+        if not np.array_equal(nextBoard, currBoard):
+            self._recursiveDF(prvBoard, nextBoard)  # go horizontal
+        else:
+            pass
 
-    def _placeNextBlack(currBoard, prvBoard, deepen=True):
+    def _placeNextBlack(self, currBoard, prvBoard, deepen=True):
         """Method for changing the game board by adding one black cell
         Returns currBoard if cannot place"""
 
         mask = currBoard - prvBoard
-        board = currBoard
+        board = np.empty_like(currBoard)
+        board = currBoard.copy()
 
         noRow = len(board)
         noCol = len(board[0])
-        if currBoard is not prvBoard:
-            x, y = utils.findPos(mask)  #coords of last change
-        else:   #entry case
+        if not np.array_equal(currBoard,prvBoard):
+            x, y = utils.findPos(mask)  # coords of last change
+        else:  # entry case
             x = 0
             y = 0
 
@@ -115,22 +121,29 @@ class Kuromasu:
             x += 1
             deepen = True
 
-        while board[x][y] is not 1:  #find next viable position for black
+        print(board[x][y])
+        while (board[x][y] != 1):  # find next viable position for black
 
             if x is (noCol - 1) and y is (noRow - 1):
-                return currBoard  #end of table, no viable positions
-                
+                return currBoard  # end of table, no viable positions
+
             if not deepen:
                 board[x][y] = 1
-                deepen = True  #do only once at the beginning of loop only when broadening the tree
+                deepen = True  # do only once at the beginning of loop only when broadening the tree
 
-            if x is noCol - 1: #advance coords
+            if x is noCol - 1:  # advance coords
                 y += 1
                 x = 0
             else:
-                x += 0
+                x += 1
 
         board[x][y] = -1
-        
+
         return board
-        
+
+
+game = Kuromasu()
+
+game.solve("DF")
+
+print("board :", game.board, "\n", "solved board: ", game.solvedBoard["board"])
