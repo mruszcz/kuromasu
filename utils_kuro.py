@@ -85,8 +85,16 @@ def count_column(board, row, col):
     return cntWhite
     
 def checkAdjacenBlack(board, row, col):
-    if( black(board[row-1][col]) or black(board[row+1][col]) or black(board[row][col-1]) or black(board[row][col+1]) ):
-        return False
+    noRow = len(board) - 1
+    noCol = len(board[0]) -1
+    if(not row == 0):
+        if( black(board[row-1][col]) ): return False
+    if( not row == noRow):
+        if( black(board[row+1][col]) ): return False
+    if( not col == 0 ):
+        if( black(board[row][col-1]) ): return False
+    if( not col == noCol ):
+        if( black(board[row][col+1]) ): return False
     else:
         return True
 
