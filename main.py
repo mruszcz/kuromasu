@@ -1,16 +1,20 @@
 import numpy as np
 from time import time
-from math import inf
+#from math #import inf
 import utils_kuro as utils
 
 
 class Kuromasu:
 
     def __init__(self):
-        self.board = np.array([[0, 0, 0, 0, 2],
-                               [0, 0, 3, 0, 0]])
-        self.solvedBoard = {"board": np.empty_like(
-            self.board), "length": inf}  # shortest board
+        self.board = np.array([[0, 0, 0, 0],
+                               [3, 0, 2, 0],
+                               [0, 3, 0, 4],
+                               [0, 0, 0, 0]])
+        
+        #[[0, 0, 0, 0, 2],
+        #                       [0, 0, 3, 0, 0]])
+        self.solvedBoard = {"board": np.empty_like(self.board), "length": np.inf}  # shortest board
 
         self.executionTime = 0
         self.iterations = 0
@@ -32,7 +36,6 @@ class Kuromasu:
             Exception("Argument error! Wrong argument for solve method")
 
     def isShorter(self, board):
-
         return (utils.length(board) < self.solvedBoard["length"])
 
     def initialize(self):

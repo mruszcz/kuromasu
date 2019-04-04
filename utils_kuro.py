@@ -119,7 +119,7 @@ def searchBlackCircle(board, start, prev, cur, first):
 
 
 
-    if (not cur[1] == noRow) and (not cur[0] == 0):
+    if (not cur[1] == noCol) and (not cur[0] == 0):
         x=cur[0] - 1
         y = cur[1] + 1
 
@@ -134,7 +134,7 @@ def searchBlackCircle(board, start, prev, cur, first):
 
 
 
-    if (not cur[1] == 0) and (not cur[0] == noCol):
+    if (not cur[1] == 0) and (not cur[0] == noRow):
         x = cur[0] + 1
         y = cur[1] - 1
         print("x", x, "y", y, "cur", cur, "prev",
@@ -148,7 +148,7 @@ def searchBlackCircle(board, start, prev, cur, first):
 
         
 
-    if (not cur[1] == noRow) and (not cur[0] == noCol):
+    if (not cur[1] == noCol) and (not cur[0] == noRow):
         x = cur[0] + 1
         y = cur[1] + 1
 
@@ -195,6 +195,7 @@ def length(board):
     len = 0
     with np.nditer(board) as iterator:
         for x in iterator:
+            print(x)
             if x == (- 1):
                 len += 1
 
