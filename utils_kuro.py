@@ -192,6 +192,7 @@ def findPos(mask):
 
 
 def length(board):
+    print(board)
     len = 0
     with np.nditer(board) as iterator:
         for x in iterator:

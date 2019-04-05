@@ -1,6 +1,7 @@
-import numpy as np
 from time import time
-#from math #import inf
+
+import numpy as np
+
 import utils_kuro as utils
 
 
@@ -10,7 +11,7 @@ class Kuromasu:
         self.board = np.array([[0, 0, 0, 0],
                                [3, 0, 2, 0],
                                [0, 3, 0, 4],
-                               [0, 0, 0, 0]])
+                               [0,0,0,0]])
         
         #[[0, 0, 0, 0, 2],
         #                       [0, 0, 3, 0, 0]])
@@ -18,13 +19,14 @@ class Kuromasu:
 
         self.executionTime = 0
         self.iterations = 0
+        self.foundSolution = False
 
     def solve(self, mode):
         """Method for solvind the board
         Arguments: self, mode
         mode can be either A* or DF"""
 
-        if mode is "A*":
+        if mode is "Astar":
             # A* algortihm
             self._astar()
 
@@ -89,13 +91,13 @@ class Kuromasu:
 
             nextBoard = self._placeNextBlack(
                 currBoard=currBoard, prvBoard=prvBoard)
-            if not np.array_equal(nextBoard, currBoard):
+            if not np.array_equal(nextBoard, prvBoard):
                 self._recursiveDF(currBoard, nextBoard)  # go deep
             else:
                 pass
 
         nextBoard = self._placeNextBlack(currBoard, prvBoard, deepen=False)
-        if not np.array_equal(nextBoard, currBoard):
+        if not np.array_equal(nextBoard, prvBoard):
             self._recursiveDF(prvBoard, nextBoard)  # go horizontal
         else:
             pass
@@ -116,15 +118,11 @@ class Kuromasu:
             x = 0
             y = 0
 
-        # if not deepen:
-        #     board[y][x] = 1
-        #     y += 1
-        #     deepen = True
 
         while (board[y][x] != 1):  # find next viable position for black
 
             if x is (noCol - 1) and y is (noRow - 1):
-                return currBoard  # end of table, no viable positions
+                return prvBoard  # end of table, no viable positions
 
             if not deepen:
                 board[y][x] = 1
@@ -140,9 +138,89 @@ class Kuromasu:
 
         return board
 
+    ##############################################################
+
+    def _astar(self):
+
+        self.initialize()
+        self.solvedBoard["board"] = self.board
+
+        entryTime = time()
+        self.iterations = 0
+
+        self._recursiveAStar()
+
+        exitTime = time()
+
+        self.executionTime = exitTime - entryTime
+
+    def _recursiveAStar(self):
+        gx = utils.length(self.solvedBoard["board"])
+        self.solvedBoard["length"] = gx
+
+        if self.foundSolution:
+            pass
+
+        tempBoard = self._placeNextBlack(self.solvedBoard["board"], self.solvedBoard["board"])
+        nextBoard = [tempBoard]
+
+        minHX = -np.inf
+
+
+        while (not np.array_equal(tempBoard, self.solvedBoard["board"])):
+            hx = self._heuristic(tempBoard)
+
+            if (not self._validate(tempBoard)) or hx > 0:
+                tempBoard = self._placeNextBlack(
+                    tempBoard, self.solvedBoard["board"], deepen=False)
+                continue
+            
+            if hx == 0 and utils.isSolution(tempBoard):
+                self.solvedBoard["board"] = tempBoard
+                self.foundSolution = True
+                break
+
+            elif hx == self._heuristic(nextBoard[0]) and not np.array_equal(tempBoard, nextBoard[0]):
+                nextBoard.append(tempBoard)
+
+            elif hx > minHX:
+                nextBoard = [tempBoard]
+                minHX = self._heuristic(nextBoard[0])
+
+            tempBoard = self._placeNextBlack(
+                tempBoard, self.solvedBoard["board"], deepen=False)
+            
+        
+        for i in range(len(nextBoard)):
+            if minHX == 0 and not utils.isSolution(nextBoard[i]):
+                continue
+        
+            self.solvedBoard["board"] = nextBoard[i]
+            self._recursiveAStar()
+        
+
+    def _heuristic(self, board):
+        reachable = 0
+        goal = 0 
+
+        for x in range(len(board)):
+            row = board[x]
+            for y in range(len(row)):
+                # if field contains a number
+                if row[y] > 1:
+                    goal += row[y]
+                    reachable += 1  # the field itself is counted
+                    reachable += utils.countColumn(board, x, y)
+                    reachable += utils.countRow(board, x, y)
+
+        
+        ratio = reachable/goal
+        return 1-ratio
+
+                
 
 game = Kuromasu()
 
-game.solve("DF")
+game.solve("Astar")
 
 print("board :", game.board, "\n", "solved board: ", game.solvedBoard, "time: ",game.executionTime)
