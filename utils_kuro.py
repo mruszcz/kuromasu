@@ -221,3 +221,10 @@ def isSolution(board):
 #                    valid = False
     print("Debug")
     return True
+
+def elemInList(tempBoard, myList):
+    for i in range(len(myList)):
+        if( np.array_equal(tempBoard, myList[i]) ):
+            return True
+        else:
+            return False

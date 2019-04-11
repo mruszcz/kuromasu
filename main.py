@@ -155,34 +155,43 @@ class Kuromasu:
         self.executionTime = exitTime - entryTime
 
     def _recursiveAStar(self):
-        gx = utils.length(self.solvedBoard["board"])
-        self.solvedBoard["length"] = gx
+        #gx = utils.length(self.solvedBoard["board"])
+        #self.solvedBoard["length"] = gx
 
         if self.foundSolution:
             pass
-
+        
+        #### BETTER EMPTY LIST BECAUSE IF NOT POSSIBLE THAT NOT SOLVABLE BOARDS ARE IN LIST
         tempBoard = self._placeNextBlack(self.solvedBoard["board"], self.solvedBoard["board"])
-        nextBoard = [tempBoard]
-
+        #nextBoard = [tempBoard]
+        nextBoard = []
         minHX = -np.inf
 
 
         while (not np.array_equal(tempBoard, self.solvedBoard["board"])):
+            #### HX HAS TO BE FLOAT ### SOLVED
             hx = self._heuristic(tempBoard)
-
+            
             if (not self._validate(tempBoard)) or hx > 0:
                 tempBoard = self._placeNextBlack(
                     tempBoard, self.solvedBoard["board"], deepen=False)
                 continue
             
+            ### exit while loop but no handling afterwards -> have to end program 
             if hx == 0 and utils.isSolution(tempBoard):
                 self.solvedBoard["board"] = tempBoard
                 self.foundSolution = True
                 break
-
-            elif hx == self._heuristic(nextBoard[0]) and not np.array_equal(tempBoard, nextBoard[0]):
+            
+            ### all boards in list have the same heuristic (= best heuristic) if better one is found -> new list
+            ### TEMP HAS TO BE COMPARED TO ALL. COULD BE SAME AS LATER ONE IN LIST
+            ### COMPARE WITH MINHX INSTEAD OF [0] TO USE EMOTY LIST AT BEGINNING
+            #elif hx == self._heuristic(nextBoard[0]) and not np.array_equal(tempBoard, nextBoard[0]):
+            elif hx == minHX and not utils.elemInList(tempBoard, nextBoard):
                 nextBoard.append(tempBoard)
-
+            
+            ### if better heuristic is found for a board -> create new list
+            ### all elements will have same heuristic value (= minHX)
             elif hx > minHX:
                 nextBoard = [tempBoard]
                 minHX = self._heuristic(nextBoard[0])
@@ -191,11 +200,22 @@ class Kuromasu:
                 tempBoard, self.solvedBoard["board"], deepen=False)
             
         
+        ### check all fields currently in list nextBoard
         for i in range(len(nextBoard)):
-            if minHX == 0 and not utils.isSolution(nextBoard[i]):
-                continue
-        
+            ### continue to check other boards of list if hx = 0 but no solution
+            #if minHX == 0 and not utils.isSolution(nextBoard[i]):
+            #    continue
+            
+            ### solution was found so just pass?! 
+            if minHX == 0 and utils.isSolution(nextBoard[i]):
+                self.solvedBoard["board"] = nextBoard[i]
+                pass
+            
+                        
+            
+            ### continue search from next board onwards
             self.solvedBoard["board"] = nextBoard[i]
+            ### if foundSolution = TRUE -> pass in recursiveAStar -> nextIteration of for loop?
             self._recursiveAStar()
         
 
@@ -214,8 +234,8 @@ class Kuromasu:
                     reachable += utils.countRow(board, x, y)
 
         
-        ratio = reachable/goal
-        return 1-ratio
+        ratio = float(reachable)/float(goal)
+        return (1-ratio)
 
                 
 
@@ -223,4 +243,4 @@ game = Kuromasu()
 
 game.solve("Astar")
 
-print("board :", game.board, "\n", "solved board: ", game.solvedBoard, "time: ",game.executionTime)
+print "board :", game.board, "\n solved board: ", game.solvedBoard["board"], "time: ",game.executionTime
