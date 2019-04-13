@@ -8,13 +8,15 @@ import utils_kuro as utils
 class Kuromasu:
 
     def __init__(self):
-        self.board = np.array([[0, 0, 0, 0],
-                               [3, 0, 2, 0],
-                               [0, 3, 0, 4],
-                               [0,0,0,0]])
+        self.board = np.array([[0, 0, 0, 0, 2],
+                               [0, 0, 3, 0, 0]])
         
         #[[0, 0, 0, 0, 2],
         #                       [0, 0, 3, 0, 0]])
+        #[[0, 0, 0, 0],
+        # [3, 0, 2, 0],
+        # [0, 3, 0, 4],
+        # [0, 0, 0, 0]]
         self.solvedBoard = {"board": np.empty_like(self.board), "length": np.inf}  # shortest board
 
         self.executionTime = 0
@@ -143,18 +145,18 @@ class Kuromasu:
     def _astar(self):
 
         self.initialize()
-        self.solvedBoard["board"] = self.board
+        #self.solvedBoard["board"] = self.board
 
         entryTime = time()
         self.iterations = 0
 
-        self._recursiveAStar()
+        self._recursiveAStar(self.board)
 
         exitTime = time()
 
         self.executionTime = exitTime - entryTime
 
-    def _recursiveAStar(self):
+    def _recursiveAStar(self, currBoard):
         #gx = utils.length(self.solvedBoard["board"])
         #self.solvedBoard["length"] = gx
 
@@ -162,19 +164,19 @@ class Kuromasu:
             pass
         
         #### BETTER EMPTY LIST BECAUSE IF NOT POSSIBLE THAT NOT SOLVABLE BOARDS ARE IN LIST
-        tempBoard = self._placeNextBlack(self.solvedBoard["board"], self.solvedBoard["board"])
+        tempBoard = self._placeNextBlack(currBoard, currBoard)
         #nextBoard = [tempBoard]
         nextBoard = []
         minHX = -np.inf
 
 
-        while (not np.array_equal(tempBoard, self.solvedBoard["board"])):
+        while (not np.array_equal(tempBoard, currBoard)):
             #### HX HAS TO BE FLOAT ### SOLVED
             hx = self._heuristic(tempBoard)
             
             if (not self._validate(tempBoard)) or hx > 0:
                 tempBoard = self._placeNextBlack(
-                    tempBoard, self.solvedBoard["board"], deepen=False)
+                    tempBoard, currBoard, deepen=False)
                 continue
             
             ### exit while loop but no handling afterwards -> have to end program 
@@ -185,7 +187,7 @@ class Kuromasu:
             
             ### all boards in list have the same heuristic (= best heuristic) if better one is found -> new list
             ### TEMP HAS TO BE COMPARED TO ALL. COULD BE SAME AS LATER ONE IN LIST
-            ### COMPARE WITH MINHX INSTEAD OF [0] TO USE EMOTY LIST AT BEGINNING
+            ### COMPARE WITH MINHX INSTEAD OF [0] TO USE EMPTY LIST AT BEGINNING
             #elif hx == self._heuristic(nextBoard[0]) and not np.array_equal(tempBoard, nextBoard[0]):
             elif hx == minHX and not utils.elemInList(tempBoard, nextBoard):
                 nextBoard.append(tempBoard)
@@ -194,10 +196,10 @@ class Kuromasu:
             ### all elements will have same heuristic value (= minHX)
             elif hx > minHX:
                 nextBoard = [tempBoard]
-                minHX = self._heuristic(nextBoard[0])
+                minHX = hx
 
             tempBoard = self._placeNextBlack(
-                tempBoard, self.solvedBoard["board"], deepen=False)
+                tempBoard, currBoard, deepen=False)
             
         
         ### check all fields currently in list nextBoard
@@ -207,16 +209,19 @@ class Kuromasu:
             #    continue
             
             ### solution was found so just pass?! 
-            if minHX == 0 and utils.isSolution(nextBoard[i]):
-                self.solvedBoard["board"] = nextBoard[i]
-                pass
+            if minHX == 0:
+                if utils.isSolution(nextBoard[i]):
+                    self.solvedBoard["board"] = nextBoard[i]
+                    break
+                else:
+                    continue
             
                         
             
             ### continue search from next board onwards
-            self.solvedBoard["board"] = nextBoard[i]
+            #self.solvedBoard["board"] = nextBoard[i]
             ### if foundSolution = TRUE -> pass in recursiveAStar -> nextIteration of for loop?
-            self._recursiveAStar()
+            self._recursiveAStar(nextBoard[i])
         
 
     def _heuristic(self, board):
@@ -243,4 +248,4 @@ game = Kuromasu()
 
 game.solve("Astar")
 
-print "board :", game.board, "\n solved board: ", game.solvedBoard["board"], "time: ",game.executionTime
+print ("board :\n", game.board, "\n solved board: \n", game.solvedBoard["board"], "time: ",game.executionTime)
