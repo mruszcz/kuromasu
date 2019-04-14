@@ -169,11 +169,9 @@ def findPos(mask):
 
 
 def length(board):
-    print(board)
     len = 0
     with np.nditer(board) as iterator:
         for x in iterator:
-            print(x)
             if x == (-1):
                 len += 1
 
@@ -206,7 +204,7 @@ def elemInList(tempBoard, boardList):
             return False
 
 
-def heuristic(self, board):
+def heuristic(board):
     reachable = 0
     goal = 0
     for x in range(len(board)):
@@ -222,7 +220,7 @@ def heuristic(self, board):
     return 1 - ratio
 
 
-def validate(self, board):
+def validate(board):
     """checks board agianst rules of the game.
     Returns True if board is coorect,
     False otherwise
@@ -241,7 +239,7 @@ def validate(self, board):
     return True
 
 
-def placeNextBlack(self, currBoard, prvBoard, deepen=True):
+def placeNextBlack(currBoard, prvBoard, deepen=True):
     """Function for changing the game board by adding one black cell
     on next viable position.
     Returns currBoard if cannot place"""
@@ -253,7 +251,7 @@ def placeNextBlack(self, currBoard, prvBoard, deepen=True):
     noRow = len(board)
     noCol = len(board[0])
     if not np.array_equal(currBoard, prvBoard):
-        x, y = utils.findPos(mask)  # coords of last change
+        x, y = findPos(mask)  # coords of last change
     else:  # entry case
         x = 0
         y = 0

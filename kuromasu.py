@@ -13,7 +13,7 @@ class Kuromasu:
     due to recursion limit
     """
 
-    def __init__(self, baord):
+    def __init__(self, board):
         self.board = board
         self.solvedBoard = {"board": np.empty_like(self.board),
                             "length": np.inf}
@@ -38,11 +38,11 @@ class Kuromasu:
             print("Argument error! Wrong argument for solve method")
 
     def print(self):
-        print("Starting board:\n", board,
-              "Solved board:\n", self.solvedBoard["board"],
-              "Execution time: {}, Iteration count: {}".format(
-                                                        self.executionTime,
-                                                        self.iterations))
+        print("Starting board:\n", self.board,
+              "\nSolved board:\n", self.solvedBoard["board"],
+              "\nExecution time: {}, Iteration count: {}".format(
+                  self.executionTime,
+                  self.iterations))
 
     def _isShorter(self, board):
         return utils.length(board) < self.solvedBoard["length"]
@@ -57,7 +57,7 @@ class Kuromasu:
     def _DF(self):
         """Implementation of depth-first algorithm"""
 
-        self.initialize()  # whiten all
+        self._initialize()  # whiten all
 
         entryTime = time.process_time()
         self.iterations = 0
@@ -74,7 +74,7 @@ class Kuromasu:
         self.iterations += 1
 
         if utils.validate(currBoard):
-            if utils.isSolution(currBoard) and self.isShorter(currBoard):
+            if utils.isSolution(currBoard) and self._isShorter(currBoard):
                 self.solvedBoard["board"] = currBoard
                 self.solvedBoard["length"] = utils.length(currBoard)
 
@@ -93,14 +93,14 @@ class Kuromasu:
 
     def _astar(self):
 
-        self.initialize()
+        self._initialize()
 
         entryTime = time.process_time()
         self.iterations = 0
 
         self._recursiveAStar(self.board)
 
-        exitTime = tim.process_time()
+        exitTime = time.process_time()
         self.executionTime = exitTime - entryTime
 
     def _recursiveAStar(self, currBoard):
@@ -113,7 +113,7 @@ class Kuromasu:
         minHX = -np.inf
 
         while not np.array_equal(tempBoard, currBoard):
-
+            self.iterations += 1
             hx = utils.heuristic(tempBoard)
 
             if (not utils.validate(tempBoard)) or hx > 0:
@@ -136,7 +136,7 @@ class Kuromasu:
                 nextBoard = [tempBoard]
                 minHX = hx
 
-            tempBoard = utilssplaceNextBlack(tempBoard, currBoard,
+            tempBoard = utils.placeNextBlack(tempBoard, currBoard,
                                              deepen=False)
 
         for i in range(len(nextBoard)):
